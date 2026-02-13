@@ -36,18 +36,24 @@ print("This is missing column\n",summary)
 # product review written, it missing maybe because customer didn't open it or write one
 
 count_behavior = ["Wishlist_Items","Customer_Service_Calls","Product_Reviews_Written"]
+important_cols = ["Credit_Balance", "Days_Since_Last_Purchase"]
+
+#divide missing
+missing = [col for col in missing
+           if col not in count_behavior
+           and col not in important_cols
+           ]
 
 df[count_behavior] = df[count_behavior].fillna(0)
 
-df["Days_Since_Last_Purchase"] = df["Days_Since_Last_Purchase"].isna().astype(int)
+for col in important_cols:
+    df[col+"_missing"] = df[col].isna().astype(int) #flag with column has too high max value, heavily right skew
+
+df[important_cols] = df[important_cols].fillna(df[important_cols].median())
 
 df[missing] = df[missing].fillna(df[missing].median())
 
-print("Checking dataframe missing\n",df[missing].describe())
-
-
-
-print("Data frame after dealing with missnig value:\n",df.describe())
+print("Data frame after dealing with missnig value:\n",df.info())
 
 
 #Second is dealing with error data
