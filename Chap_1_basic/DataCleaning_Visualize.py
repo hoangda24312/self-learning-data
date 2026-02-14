@@ -55,6 +55,63 @@ df[missing] = df[missing].fillna(df[missing].median())
 
 print("Data frame after dealing with missnig value:\n",df.info())
 
-
 #Second is dealing with error data
+
+category_list = [col for col in df if df[col].dtypes == 'object']
+float_list = [col for col in df if df[col].dtypes == 'float64']
+int_list = [col for col in df if df[col].dtypes == 'int64']
+
+#check if there is any error in string type such as bUnmA instead Bunma
+
+for col in category_list:
+    print(df[col].unique())
+
+for col in float_list: #if it < 0, maybe it is because they didn't buy anything
+    df.loc[df[col] < 0, col] = 0 
+
+#so we have nothing to do with Object, let's proceed to the next step, outliner
 #Third is dealing with outliner data
+
+#deal with float data type first
+print(df[float_list].describe().T)
+
+#first is col rate, we only have 0-100 right ? so let's clip it to 0-100
+rate_cols = [
+    "Cart_Abandonment_Rate",
+    "Discount_Usage_Rate",
+    "Returns_Rate",
+    "Email_Open_Rate"
+]
+
+for col in rate_cols:
+    df[col] = df[col].clip(0,100)
+
+df["Age"] = df["Age"].clip(18,80) #average human age is different from each country, however they around 73-80
+
+df["Total_Purchases"] = df["Total_Purchases"].round().astype("int64") #no way total purchase is float 
+
+extremely_high_list = ["Lifetime_Value","Credit_Balance","Average_Order_Value"] #value that extremely high, we didn't sure that if it is really error or VIP member
+
+for col in extremely_high_list:
+    upper = df[col].quantile(0.99)
+    df[col] = df[col].clip(upper=upper)
+
+print("after dealing with outliner\n",df[float_list].describe().T)
+
+print("skewness checking\n",df[float_list].skew().sort_values(ascending=False)) #seem like we have some extremely skew
+
+#dealing with numeric col
+
+numeric_col = [col for col in df if df[col].dtypes == "int64" ]
+
+print("this is numeric_col", numeric_col) #min and max is 0 and 1, there is only one thing we need to worry about is that total purchase
+
+df["Total_Purchases"] = df["Total_Purchases"].clip(upper= df["Total_Purchases"].quantile(0.99))
+
+df = pd.get_dummies(df, drop_first=True)
+
+print(df.describe().T)
+print(df.info())
+
+#deal with skewness by scaling
+#plot into matplotliab
