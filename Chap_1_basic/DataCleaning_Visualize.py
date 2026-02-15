@@ -1,6 +1,6 @@
 import pandas as pd
 import numpy as np
-import matplotlib as plt
+from matplotlib  import pyplot as plt
 
 
 #create dataframe by reading csv
@@ -113,5 +113,7 @@ df = pd.get_dummies(df, drop_first=True)
 print(df.describe().T)
 print(df.info())
 
-#deal with skewness by scaling
 #plot into matplotliab
+df.boxplot(column="Age", by="Churned")
+
+plt.show()
