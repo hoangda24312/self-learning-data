@@ -1,5 +1,6 @@
 import pandas as pd
 import numpy as np
+import seaborn as sns
 from matplotlib  import pyplot as plt
 
 
@@ -114,6 +115,26 @@ print(df.describe().T)
 print(df.info())
 
 #plot into matplotliab
-df.boxplot(column="Age", by="Churned")
+def show_fig():
+    plt.tight_layout()
+    plt.show()
 
-plt.show()
+plot_no = 1
+
+fig = plt.figure(figsize=(10,6))
+sns.histplot(data = df["Age"],kde=True, bins=40)
+plt.title(f"{plot_no} Age distrubution spread")
+show_fig()
+plot_no+=1
+
+fig = plt.figure(figsize=(10,6))
+sns.histplot(data= df,x="Age", kde=True, bins=40, hue="Churned",multiple="fill")
+plt.title(f"{plot_no} Churned by Age")
+show_fig()
+plot_no+=1
+
+fig = plt.figure(figsize=(10,6))
+sns.scatterplot(data=df, x="Age", y="Social_Media_Engagement_Score", hue="Churned")
+plt.title(f"{plot_no} Social media by age")
+show_fig()
+plot_no+=1
